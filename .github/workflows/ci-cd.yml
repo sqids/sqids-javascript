@@ -1,0 +1,51 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - next
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    name: Test on node ${{ matrix.node }}
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [16]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'yarn'
+      - name: Install dependencies and test
+        run: |
+          yarn install --immutable
+          yarn build
+          yarn test
+
+  publish:
+    name: Publish package to NPM
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next')
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'yarn'
+      - name: Build and release
+        run: |
+          yarn install --immutable
+          yarn build
+          yarn release
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

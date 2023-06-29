@@ -1,0 +1,109 @@
+{
+  "name": "sqids",
+  "description": "Generate YouTube-like ids from numbers.",
+  "keywords": [
+    "sqids",
+    "encode",
+    "ids"
+  ],
+  "homepage": "https://sqids.org/javascript",
+  "bugs": {
+    "url": "https://github.com/sqids/sqids-javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqids/sqids-javascript.git"
+  },
+  "license": "MIT",
+  "author": "sqids.org <npm@invent.life> (https://github.com/sqids)",
+  "contributors": [
+    {
+      "name": "Bazyli Brzóska",
+      "email": "npm@invent.life",
+      "url": "https://twitter.com/niieani"
+    }
+  ],
+  "exports": {
+    ".": {
+      "import": "./esm/sqids.js",
+      "require": "./cjs/index.js"
+    },
+    "./*": {
+      "import": "./esm/*.js",
+      "require": "./cjs/*.js"
+    },
+    "./cjs": {
+      "require": "./cjs/index.js"
+    },
+    "./cjs/*": {
+      "require": "./cjs/*.js"
+    },
+    "./esm/*": {
+      "import": "./esm/*.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "cjs/index.js",
+  "unpkg": "dist/sqids.js",
+  "module": "esm/sqids.js",
+  "source": "src/sqids.ts",
+  "files": [
+    "cjs",
+    "esm",
+    "dist",
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "benchmark": "yarn ts-node -O '{\"module\": \"commonjs\"}' -T src/tests/benchmark",
+    "postinstallDev": "yarn prepare",
+    "prepare": "rrun husky install .config/husky && yarn beemo create-config",
+    "build": "yarn build:cjs && yarn build:esm && yarn build:umd",
+    "release": "beemo run-script release",
+    "build:cjs": "yarn rrun tsc --outDir cjs --module commonjs --target es6 -p tsconfig.build.json",
+    "build:esm": "yarn rrun tsc --outDir esm --module esnext --target es6 -p tsconfig.build.json && ./add-extension.sh",
+    "build:umd": "beemo webpack --entry=./src/sqids.ts --env 'outDir=dist' --env 'moduleTarget=umd' --env 'engineTarget=web' --env 'codeTarget=es6' --env 'name=Sqids' --env 'export=default' --env 'filename=sqids.js'",
+    "clean": "git clean -dfX --exclude=node_modules src && beemo typescript:sync-project-refs",
+    "test:lint": "rrun eslint 'src/**'",
+    "test:code": "beemo jest",
+    "test:types": "yarn rrun tsc --noEmit",
+    "test:format": "yarn rrun prettier --check \"./{src,tests}/**/*[!.d].{.js,jsx,ts,tsx,json,md}\"",
+    "test": "yarn test:format && yarn test:types && yarn test:lint && yarn test:code",
+    "format": "yarn rrun prettier --write \"./{src,tests}/**/!(*.d).{.js,jsx,ts,tsx,json,md}\""
+  },
+  "browserslist": [
+    "last 2 version",
+    "> 0.5%",
+    "maintained node versions",
+    "not dead"
+  ],
+  "devDependencies": {
+    "@niieani/scaffold": "^1.7.3",
+    "nodemark": "^0.3.0",
+    "require-from-web": "^1.2.0",
+    "ts-node": "^10.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "release": {
+    "branches": [
+      "+([0-9])?(.{+([0-9]),x}).x",
+      "master",
+      {
+        "name": "main",
+        "channel": false
+      },
+      "next",
+      {
+        "name": "beta",
+        "prerelease": true
+      },
+      {
+        "name": "alpha",
+        "prerelease": true
+      }
+    ]
+  },
+  "packageManager": "yarn@3.6.1"
+}

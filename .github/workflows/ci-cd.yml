@@ -10,6 +10,16 @@ on:
     branches:
       - '**'
 
+permissions:
+  actions: write
+  contents: write
+  deployments: write
+  issues: write
+  packages: write
+  pull-requests: write
+  security-events: write
+  statuses: write
+
 jobs:
   test:
     name: Test on node ${{ matrix.node }}

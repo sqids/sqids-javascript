@@ -1,8 +1,8 @@
-type SqidsOptions = {
+interface SqidsOptions {
     alphabet?: string;
     minLength?: number;
     blocklist?: Set<string>;
-};
+}
 export declare const defaultOptions: {
     alphabet: string;
     minLength: number;
@@ -14,10 +14,10 @@ export default class Sqids {
     private blocklist;
     constructor(options?: SqidsOptions);
     encode(numbers: number[]): string;
-    private encodeNumbers;
     decode(id: string): number[];
     minValue(): number;
     maxValue(): number;
+    private encodeNumbers;
     private shuffle;
     private toId;
     private toNumber;

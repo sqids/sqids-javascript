@@ -1,8 +1,5 @@
 # [Sqids JavaScript](https://sqids.org/javascript)
 
-> **Note**
-> 🚧 This repository is a work-in-progress and not ready for production.
-
 [![npm version](https://img.shields.io/npm/v/sqids.svg)](https://www.npmjs.com/package/sqids)
 [![Downloads](https://img.shields.io/npm/dm/sqids)](https://www.npmjs.com/package/sqids)
 

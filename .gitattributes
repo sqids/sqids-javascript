@@ -1,4 +1,3 @@
-**/blocklist.* binary
 .yarn/**/* binary
 cjs/**/* binary
 dist/**/* binary

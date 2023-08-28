@@ -28,14 +28,14 @@
   "exports": {
     ".": {
       "import": "./esm/sqids.js",
-      "require": "./cjs/index.js"
+      "require": "./cjs/sqids.js"
     },
     "./*": {
       "import": "./esm/*.js",
       "require": "./cjs/*.js"
     },
     "./cjs": {
-      "require": "./cjs/index.js"
+      "require": "./cjs/sqids.js"
     },
     "./cjs/*": {
       "require": "./cjs/*.js"
@@ -45,7 +45,7 @@
     },
     "./package.json": "./package.json"
   },
-  "main": "cjs/index.js",
+  "main": "cjs/sqids.js",
   "unpkg": "dist/sqids.js",
   "module": "esm/sqids.js",
   "source": "src/sqids.ts",

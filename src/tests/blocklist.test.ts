@@ -74,4 +74,17 @@ describe('blocklist', () => {
 
     expect(sqids.decode(sqids.encode([1_000]))).toEqual([1_000])
   })
+
+  it('blocklist filtering in constructor', () => {
+    const sqids = new Sqids({
+      alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      blocklist: new Set(['sqnmpn']), // lowercase blocklist in only-uppercase alphabet
+    })
+
+    const id = sqids.encode([1, 2, 3])
+    const numbers = sqids.decode(id)
+
+    expect(id).toBe('ULPBZGBM') // without blocklist, would've been "SQNMPN"
+    expect(numbers).toEqual([1, 2, 3])
+  })
 })

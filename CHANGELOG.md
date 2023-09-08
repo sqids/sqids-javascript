@@ -1,6 +1,6 @@
 # CHANGELOG
 
-**v0.2.0:** **⚠️ BREAKING CHANGE**
+**v0.3.0:** **⚠️ BREAKING CHANGE**
 - **Breaking change**: IDs change. Algorithm has been fine-tuned for better performance [[Issue #11](https://github.com/sqids/sqids-spec/issues/11)]
 - Changed minimum Node.js version from 16 to 18
 - `alphabet` cannot contain multibyte characters

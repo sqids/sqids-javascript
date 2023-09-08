@@ -15,12 +15,11 @@ export default class Sqids {
     constructor(options?: SqidsOptions);
     encode(numbers: number[]): string;
     decode(id: string): number[];
-    minValue(): number;
-    maxValue(): number;
     private encodeNumbers;
     private shuffle;
     private toId;
     private toNumber;
     private isBlockedId;
+    private maxValue;
 }
 export {};

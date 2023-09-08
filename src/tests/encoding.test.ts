@@ -5,15 +5,13 @@ describe('encoding', () => {
     const sqids = new Sqids()
 
     const numbers = [1, 2, 3]
-    const id = '8QRLaD'
+    const id = '86Rf07'
 
     expect(sqids.encode(numbers)).toBe(id)
     expect(sqids.decode(id)).toEqual(numbers)
   })
 
   it('different inputs', () => {
-    const sqids = new Sqids()
-
     const numbers = [
       0,
       0,
@@ -25,8 +23,10 @@ describe('encoding', () => {
       1_000,
       100_000,
       1_000_000,
-      sqids.maxValue(),
+      Number.MAX_SAFE_INTEGER,
     ]
+
+    const sqids = new Sqids()
     expect(sqids.decode(sqids.encode(numbers))).toEqual(numbers)
   })
 
@@ -34,16 +34,16 @@ describe('encoding', () => {
     const sqids = new Sqids()
 
     const ids = {
-      bV: [0],
-      U9: [1],
-      g8: [2],
-      Ez: [3],
-      V8: [4],
-      ul: [5],
-      O3: [6],
-      AF: [7],
-      ph: [8],
-      n8: [9],
+      bM: [0],
+      Uk: [1],
+      gb: [2],
+      Ef: [3],
+      Vq: [4],
+      uw: [5],
+      OI: [6],
+      AX: [7],
+      p6: [8],
+      nJ: [9],
     }
 
     for (const [id, numbers] of Object.entries(ids)) {
@@ -56,16 +56,16 @@ describe('encoding', () => {
     const sqids = new Sqids()
 
     const ids = {
-      SrIu: [0, 0],
-      nZqE: [0, 1],
-      tJyf: [0, 2],
-      e86S: [0, 3],
-      rtC7: [0, 4],
-      sQ8R: [0, 5],
-      uz2n: [0, 6],
-      '7Td9': [0, 7],
-      '3nWE': [0, 8],
-      mIxM: [0, 9],
+      SvIz: [0, 0],
+      n3qa: [0, 1],
+      tryF: [0, 2],
+      eg6q: [0, 3],
+      rSCF: [0, 4],
+      sR8x: [0, 5],
+      uY2M: [0, 6],
+      '74dI': [0, 7],
+      '30WX': [0, 8],
+      moxr: [0, 9],
     }
 
     for (const [id, numbers] of Object.entries(ids)) {
@@ -78,16 +78,16 @@ describe('encoding', () => {
     const sqids = new Sqids()
 
     const ids = {
-      SrIu: [0, 0],
-      nbqh: [1, 0],
-      t4yj: [2, 0],
-      eQ6L: [3, 0],
-      r4Cc: [4, 0],
-      sL82: [5, 0],
-      uo2f: [6, 0],
-      '7Zdq': [7, 0],
-      '36Wf': [8, 0],
-      m4xT: [9, 0],
+      SvIz: [0, 0],
+      nWqP: [1, 0],
+      tSyw: [2, 0],
+      eX68: [3, 0],
+      rxCY: [4, 0],
+      sV8a: [5, 0],
+      uf2K: [6, 0],
+      '7Cdk': [7, 0],
+      '3aWP': [8, 0],
+      m2xn: [9, 0],
     }
 
     for (const [id, numbers] of Object.entries(ids)) {
@@ -126,16 +126,13 @@ describe('encoding', () => {
     expect(sqids.decode('*')).toEqual([])
   })
 
-  it('decoding an invalid ID with a repeating reserved character', () => {
-    const sqids = new Sqids()
-    expect(sqids.decode('fff')).toEqual([])
-  })
-
   it('encode out-of-range numbers', () => {
     const sqids = new Sqids()
-    const err = `Encoding supports numbers between ${sqids.minValue()} and ${sqids.maxValue()}`
+    const encodingError = `Encoding supports numbers between 0 and ${Number.MAX_SAFE_INTEGER}`
 
-    expect(() => sqids.encode([sqids.minValue() - 1])).toThrow(err)
-    expect(() => sqids.encode([sqids.maxValue() + 1])).toThrow(err)
+    expect(() => sqids.encode([-1])).toThrow(encodingError)
+    expect(() => sqids.encode([Number.MAX_SAFE_INTEGER + 1])).toThrow(
+      encodingError,
+    )
   })
 })

@@ -4,8 +4,8 @@ describe('blocklist', () => {
   it('if no custom blocklist param, use the default blocklist', () => {
     const sqids = new Sqids()
 
-    expect(sqids.decode('sexy')).toEqual([200_044])
-    expect(sqids.encode([200_044])).toBe('d171vI')
+    expect(sqids.decode('aho1e')).toEqual([4_572_721])
+    expect(sqids.encode([4_572_721])).toBe('JExTR')
   })
 
   it(`if an empty blocklist param passed, don't use any blocklist`, () => {
@@ -13,63 +13,57 @@ describe('blocklist', () => {
       blocklist: new Set([]),
     })
 
-    expect(sqids.decode('sexy')).toEqual([200_044])
-    expect(sqids.encode([200_044])).toBe('sexy')
+    expect(sqids.decode('aho1e')).toEqual([4_572_721])
+    expect(sqids.encode([4_572_721])).toBe('aho1e')
   })
 
   it('if a non-empty blocklist param passed, use only that', () => {
     const sqids = new Sqids({
       blocklist: new Set([
-        'AvTg', // originally encoded [100000]
+        'ArUO', // originally encoded [100000]
       ]),
     })
 
     // make sure we don't use the default blocklist
-    expect(sqids.decode('sexy')).toEqual([200_044])
-    expect(sqids.encode([200_044])).toBe('sexy')
+    expect(sqids.decode('aho1e')).toEqual([4_572_721])
+    expect(sqids.encode([4_572_721])).toBe('aho1e')
 
     // make sure we are using the passed blocklist
-    expect(sqids.decode('AvTg')).toEqual([100_000])
-    expect(sqids.encode([100_000])).toBe('7T1X8k')
-    expect(sqids.decode('7T1X8k')).toEqual([100_000])
+    expect(sqids.decode('ArUO')).toEqual([100_000])
+    expect(sqids.encode([100_000])).toBe('QyG4')
+    expect(sqids.decode('QyG4')).toEqual([100_000])
   })
 
   it('blocklist', () => {
     const sqids = new Sqids({
       blocklist: new Set([
-        '8QRLaD', // normal result of 1st encoding, let's block that word on purpose
-        '7T1cd0dL', // result of 2nd encoding
-        'UeIe', // result of 3rd encoding is `RA8UeIe7`, let's block a substring
-        'imhw', // result of 4th encoding is `WM3Limhw`, let's block the postfix
-        'LfUQ', // result of 4th encoding is `LfUQh4HN`, let's block the prefix
+        'JSwXFaosAN', // normal result of 1st encoding, let's block that word on purpose
+        'OCjV9JK64o', // result of 2nd encoding
+        'rBHf', // result of 3rd encoding is `4rBHfOiqd3`, let's block a substring
+        '79SM', // result of 4th encoding is `dyhgw479SM`, let's block the postfix
+        '7tE6', // result of 4th encoding is `7tE6jdAHLe`, let's block the prefix
       ]),
     })
 
-    expect(sqids.encode([1, 2, 3])).toBe('TM0x1Mxz')
-    expect(sqids.decode('TM0x1Mxz')).toEqual([1, 2, 3])
+    expect(sqids.encode([1_000_000, 2_000_000])).toBe('1aYeB7bRUt')
+    expect(sqids.decode('1aYeB7bRUt')).toEqual([1_000_000, 2_000_000])
   })
 
   it('decoding blocklist words should still work', () => {
     const sqids = new Sqids({
-      blocklist: new Set([
-        '8QRLaD',
-        '7T1cd0dL',
-        'RA8UeIe7',
-        'WM3Limhw',
-        'LfUQh4HN',
-      ]),
+      blocklist: new Set(['86Rf07', 'se8ojk', 'ARsz1p', 'Q8AI49', '5sQRZO']),
     })
 
-    expect(sqids.decode('8QRLaD')).toEqual([1, 2, 3])
-    expect(sqids.decode('7T1cd0dL')).toEqual([1, 2, 3])
-    expect(sqids.decode('RA8UeIe7')).toEqual([1, 2, 3])
-    expect(sqids.decode('WM3Limhw')).toEqual([1, 2, 3])
-    expect(sqids.decode('LfUQh4HN')).toEqual([1, 2, 3])
+    expect(sqids.decode('86Rf07')).toEqual([1, 2, 3])
+    expect(sqids.decode('se8ojk')).toEqual([1, 2, 3])
+    expect(sqids.decode('ARsz1p')).toEqual([1, 2, 3])
+    expect(sqids.decode('Q8AI49')).toEqual([1, 2, 3])
+    expect(sqids.decode('5sQRZO')).toEqual([1, 2, 3])
   })
 
   it('match against a short blocklist word', () => {
     const sqids = new Sqids({
-      blocklist: new Set(['pPQ']),
+      blocklist: new Set(['pnd']),
     })
 
     expect(sqids.decode(sqids.encode([1_000]))).toEqual([1_000])
@@ -78,13 +72,32 @@ describe('blocklist', () => {
   it('blocklist filtering in constructor', () => {
     const sqids = new Sqids({
       alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-      blocklist: new Set(['sqnmpn']), // lowercase blocklist in only-uppercase alphabet
+      blocklist: new Set(['sxnzkl']), // lowercase blocklist in only-uppercase alphabet
     })
 
     const id = sqids.encode([1, 2, 3])
     const numbers = sqids.decode(id)
 
-    expect(id).toBe('ULPBZGBM') // without blocklist, would've been "SQNMPN"
+    expect(id).toBe('IBSHOZ') // without blocklist, would've been "SXNZKL"
     expect(numbers).toEqual([1, 2, 3])
+  })
+
+  it('max encoding attempts', () => {
+    const alphabet = 'abc'
+    const minLength = 3
+    const blocklist = new Set(['cab', 'abc', 'bca'])
+
+    const sqids = new Sqids({
+      alphabet,
+      minLength,
+      blocklist,
+    })
+
+    expect(alphabet).toHaveLength(minLength)
+    expect(blocklist.size).toEqual(minLength)
+
+    expect(() => sqids.encode([0])).toThrow(
+      'Reached max attempts to re-generate the ID',
+    )
   })
 })

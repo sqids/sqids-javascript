@@ -7,7 +7,7 @@ describe('alphabet', () => {
     })
 
     const numbers = [1, 2, 3]
-    const id = '4d9fd2'
+    const id = '489158'
 
     expect(sqids.encode(numbers)).toBe(id)
     expect(sqids.decode(id)).toEqual(numbers)
@@ -15,7 +15,7 @@ describe('alphabet', () => {
 
   it('short alphabet', () => {
     const sqids = new Sqids({
-      alphabet: 'abcde',
+      alphabet: 'abc',
     })
 
     const numbers = [1, 2, 3]
@@ -32,6 +32,15 @@ describe('alphabet', () => {
     expect(sqids.decode(sqids.encode(numbers))).toEqual(numbers)
   })
 
+  it('multibyte characters', () => {
+    expect(
+      () =>
+        new Sqids({
+          alphabet: 'ë1092',
+        }),
+    ).toThrow('Alphabet cannot contain multibyte characters')
+  })
+
   it('repeating alphabet characters', () => {
     expect(
       () =>
@@ -45,8 +54,8 @@ describe('alphabet', () => {
     expect(
       () =>
         new Sqids({
-          alphabet: 'abcd',
+          alphabet: 'ab',
         }),
-    ).toThrow('Alphabet length must be at least 5')
+    ).toThrow('Alphabet length must be at least 3')
   })
 })

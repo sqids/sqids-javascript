@@ -42,22 +42,12 @@ Simple encode & decode:
 
 ```javascript
 const sqids = new Sqids()
-const id = sqids.encode([1, 2, 3]) // "8QRLaD"
+const id = sqids.encode([1, 2, 3]) // "86Rf07"
 const numbers = sqids.decode(id) // [1, 2, 3]
 ```
 
 > **Note**
 > 🚧 Because of the algorithm's design, **multiple IDs can decode back into the same sequence of numbers**. If it's important to your design that IDs are canonical, you have to manually re-encode decoded numbers and check that the generated ID matches.
-
-Randomize IDs by providing a custom alphabet:
-
-```javascript
-const sqids = new Sqids({
-  alphabet: 'FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE',
-})
-const id = sqids.encode([1, 2, 3]) // "B5aMa3"
-const numbers = sqids.decode(id) // [1, 2, 3]
-```
 
 Enforce a *minimum* length for IDs:
 
@@ -65,7 +55,17 @@ Enforce a *minimum* length for IDs:
 const sqids = new Sqids({
   minLength: 10,
 })
-const id = sqids.encode([1, 2, 3]) // "75JT1cd0dL"
+const id = sqids.encode([1, 2, 3]) // "86Rf07xd4z"
+const numbers = sqids.decode(id) // [1, 2, 3]
+```
+
+Randomize IDs by providing a custom alphabet:
+
+```javascript
+const sqids = new Sqids({
+  alphabet: 'FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE',
+})
+const id = sqids.encode([1, 2, 3]) // "B4aajs"
 const numbers = sqids.decode(id) // [1, 2, 3]
 ```
 
@@ -73,9 +73,9 @@ Prevent specific words from appearing anywhere in the auto-generated IDs:
 
 ```javascript
 const sqids = new Sqids({
-  blocklist: new Set(['word1', 'word2']),
+  blocklist: new Set(['86Rf07']),
 })
-const id = sqids.encode([1, 2, 3]) // "8QRLaD"
+const id = sqids.encode([1, 2, 3]) // "se8ojk"
 const numbers = sqids.decode(id) // [1, 2, 3]
 ```
 

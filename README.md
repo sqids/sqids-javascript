@@ -5,6 +5,8 @@
 
 [Sqids](https://sqids.org/javascript) (*pronounced "squids"*) is a small library that lets you **generate unique IDs from numbers**. It's good for link shortening, fast & URL-safe ID generation and decoding back into numbers for quicker database lookups.
 
+Supports Node.js 18 and above
+
 Features:
 
 - **Encode multiple numbers** - generate short IDs from one or several non-negative numbers

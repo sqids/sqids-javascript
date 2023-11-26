@@ -79,6 +79,9 @@
     "maintained node versions",
     "not dead"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "@niieani/scaffold": "^1.7.8",
     "nodemark": "^0.3.0",

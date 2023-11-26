@@ -606,8 +606,8 @@ export default class Sqids {
         if (numbers.length === 0) {
             return '';
         }
-        const inRangeNumbers = numbers.filter((n) => n >= 0 && n <= this.maxValue());
-        if (inRangeNumbers.length !== numbers.length) {
+        const areAllNumbersInRange = numbers.every((n) => n >= 0 && n <= this.maxValue());
+        if (!areAllNumbersInRange) {
             throw new Error(`Encoding supports numbers between 0 and ${this.maxValue()}`);
         }
         return this.encodeNumbers(numbers);

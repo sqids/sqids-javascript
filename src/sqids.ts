@@ -581,7 +581,10 @@ export default class Sqids {
     const minLength = options?.minLength ?? defaultOptions.minLength
     const blocklist = options?.blocklist ?? defaultOptions.blocklist
 
-    if (new Blob([alphabet]).size !== alphabet.length) {
+    const alphabetArr = alphabet.split("");
+    const duplicateItems = alphabetArr.filter((item, index) => alphabetArr.indexOf(item) !== index);
+
+    if (duplicateItems.length > 0) {
       throw new Error('Alphabet cannot contain multibyte characters')
     }
 

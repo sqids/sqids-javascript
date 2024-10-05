@@ -42,7 +42,7 @@ Or npm:
 npm install sqids
 ```
 
-Or use via [jsDelivr](https://www.jsdelivr.com/package/npm/sqids):
+Or use [jsDelivr](https://www.jsdelivr.com/package/npm/sqids):
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/sqids/dist/sqids.min.js"></script>

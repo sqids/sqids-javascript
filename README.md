@@ -30,10 +30,22 @@ Not good for:
 
 ## 🚀 Getting started
 
-Install Sqids via:
+Install via yarn:
 
 ```bash
 yarn add sqids
+```
+
+Or npm:
+
+```bash
+npm install sqids
+```
+
+Or use via [jsDelivr](https://www.jsdelivr.com/package/npm/sqids):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/sqids/dist/sqids.min.js"></script>
 ```
 
 ## 👩‍💻 Examples

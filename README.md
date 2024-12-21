@@ -30,19 +30,25 @@ Not good for:
 
 ## 🚀 Getting started
 
-Install via yarn:
+yarn:
 
 ```bash
 yarn add sqids
 ```
 
-Or npm:
+[npm](https://www.npmjs.com/package/sqids):
 
 ```bash
 npm install sqids
 ```
 
-Or use [jsDelivr](https://www.jsdelivr.com/package/npm/sqids):
+[cdnjs](https://cdnjs.com/libraries/sqids):
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sqids/0.3.0/sqids.min.js"></script>
+```
+
+[jsDelivr](https://www.jsdelivr.com/package/npm/sqids):
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/sqids/dist/sqids.min.js"></script>

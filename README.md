@@ -97,6 +97,18 @@ const id = sqids.encode([1, 2, 3]) // "se8ojk"
 const numbers = sqids.decode(id) // [1, 2, 3]
 ```
 
+### Using Sqids in Node.js 
+
+```javascript
+const Sqids = require('sqids').default;
+const sqids = new Sqids({
+    blocklist: new Set(['86Rf07']),
+});
+
+const id = sqids.encode([1, 2, 3]) // "IivTBt"
+const numbers = sqids.decode(id) // [4, 5, 6]
+```
+
 ## 📝 License
 
 [MIT](LICENSE)

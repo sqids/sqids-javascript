@@ -105,7 +105,7 @@ const sqids = new Sqids({
     blocklist: new Set(['86Rf07']),
 });
 
-const id = sqids.encode([1, 2, 3]) // "IivTBt"
+const id = sqids.encode([4, 5, 6]) // "IivTBt"
 const numbers = sqids.decode(id) // [4, 5, 6]
 ```
 

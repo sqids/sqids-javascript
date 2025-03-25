@@ -59,6 +59,8 @@ npm install sqids
 Simple encode & decode:
 
 ```javascript
+import Sqids from 'sqids'
+
 const sqids = new Sqids()
 const id = sqids.encode([1, 2, 3]) // "86Rf07"
 const numbers = sqids.decode(id) // [1, 2, 3]
@@ -70,6 +72,8 @@ const numbers = sqids.decode(id) // [1, 2, 3]
 Enforce a *minimum* length for IDs:
 
 ```javascript
+import Sqids from 'sqids'
+
 const sqids = new Sqids({
   minLength: 10,
 })
@@ -80,6 +84,8 @@ const numbers = sqids.decode(id) // [1, 2, 3]
 Randomize IDs by providing a custom alphabet:
 
 ```javascript
+import Sqids from 'sqids'
+
 const sqids = new Sqids({
   alphabet: 'FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE',
 })
@@ -90,6 +96,8 @@ const numbers = sqids.decode(id) // [1, 2, 3]
 Prevent specific words from appearing anywhere in the auto-generated IDs:
 
 ```javascript
+import Sqids from 'sqids'
+
 const sqids = new Sqids({
   blocklist: new Set(['86Rf07']),
 })

@@ -66,6 +66,7 @@
     "build:umd": "tsdown umd-entry.ts --format umd --out-dir dist --global-name Sqids --platform browser --minify",
     "check": "biome check .",
     "check:write": "biome check --write .",
+    "example": "tsdown examples/usage.ts --format esm --out-dir mjs/example && node mjs/example/usage.js",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint": "biome lint .",

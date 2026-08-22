@@ -1,8 +1,15 @@
-interface SqidsOptions {
+type SqidsInteger<BigIntMode extends boolean> = BigIntMode extends true
+  ? bigint
+  : number
+
+export interface SqidsOptions<BigIntMode extends boolean = false> {
   alphabet?: string
   minLength?: number
   blocklist?: Set<string>
+  bigint?: BigIntMode
 }
+
+const maxUint64 = (1n << 64n) - 1n
 
 export const defaultOptions = {
   alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
@@ -571,15 +578,18 @@ export const defaultOptions = {
   ]),
 }
 
-export default class Sqids {
+export default class Sqids<BigIntMode extends boolean = false> {
   private alphabet: string
   private minLength: number
   private blocklist: Set<string>
+  private bigintMode: BigIntMode
 
-  constructor(options?: SqidsOptions) {
+  constructor(options?: SqidsOptions<BigIntMode>) {
     const alphabet = options?.alphabet ?? defaultOptions.alphabet
     const minLength = options?.minLength ?? defaultOptions.minLength
     const blocklist = options?.blocklist ?? defaultOptions.blocklist
+
+    this.bigintMode = (options?.bigint ?? false) as BigIntMode
 
     if (new Blob([alphabet]).size !== alphabet.length) {
       throw new Error('Alphabet cannot contain multibyte characters')
@@ -623,34 +633,53 @@ export default class Sqids {
     this.blocklist = filteredBlocklist
   }
 
-  encode(numbers: number[]): string {
+  encode(numbers: SqidsInteger<BigIntMode>[]): string {
     if (numbers.length === 0) {
       return ''
     }
 
-    const areAllNumbersInRange = numbers.every(
-      (n) => n >= 0 && n <= this.maxValue(),
-    )
-    if (!areAllNumbersInRange) {
-      throw new Error(
-        `Encoding supports numbers between 0 and ${this.maxValue()}`,
-      )
-    }
+    const normalizedNumbers = numbers.map((number) => {
+      if (this.bigintMode) {
+        if (
+          typeof number !== 'bigint' ||
+          number < 0n ||
+          number > this.maxValue()
+        ) {
+          throw new Error(
+            `Encoding supports bigints between 0n and ${this.maxValue()}n`,
+          )
+        }
 
-    return this.encodeNumbers(numbers)
+        return number
+      }
+
+      if (
+        typeof number !== 'number' ||
+        !Number.isSafeInteger(number) ||
+        number < 0
+      ) {
+        throw new Error(
+          `Encoding supports numbers between 0 and ${this.maxValue()}`,
+        )
+      }
+
+      return BigInt(number)
+    })
+
+    return this.encodeNumbers(normalizedNumbers)
   }
 
-  decode(id: string): number[] {
-    const ret: number[] = []
+  decode(id: string): SqidsInteger<BigIntMode>[] {
+    const ret: bigint[] = []
 
     if (id === '') {
-      return ret
+      return ret as SqidsInteger<BigIntMode>[]
     }
 
     const alphabetChars = this.alphabet.split('')
     for (const c of id.split('')) {
       if (!alphabetChars.includes(c)) {
-        return ret
+        return ret as SqidsInteger<BigIntMode>[]
       }
     }
 
@@ -666,10 +695,17 @@ export default class Sqids {
       const chunks = slicedId.split(separator)
       if (chunks.length > 0) {
         if (chunks[0] === '') {
-          return ret
+          return (
+            this.bigintMode ? ret : ret.map(Number)
+          ) as SqidsInteger<BigIntMode>[]
         }
 
-        ret.push(this.toNumber(chunks[0]!, alphabet.slice(1)))
+        const number = this.toNumber(chunks[0]!, alphabet.slice(1))
+        if (number > this.maxValue()) {
+          return [] as SqidsInteger<BigIntMode>[]
+        }
+
+        ret.push(number)
         if (chunks.length > 1) {
           alphabet = this.shuffle(alphabet)
         }
@@ -678,20 +714,27 @@ export default class Sqids {
       slicedId = chunks.slice(1).join(separator)
     }
 
-    return ret
+    if (this.bigintMode) {
+      return ret as SqidsInteger<BigIntMode>[]
+    }
+
+    return ret.map(Number) as SqidsInteger<BigIntMode>[]
   }
 
-  private encodeNumbers(numbers: number[], increment = 0): string {
+  private encodeNumbers(numbers: bigint[], increment = 0): string {
     if (increment > this.alphabet.length) {
       throw new Error('Reached max attempts to re-generate the ID')
     }
 
-    let offset =
-      numbers.reduce(
-        (a, v, i) =>
-          this.alphabet[v % this.alphabet.length]!.codePointAt(0)! + i + a,
-        numbers.length,
-      ) % this.alphabet.length
+    const alphabetLength = BigInt(this.alphabet.length)
+    let offset = Number(
+      numbers.reduce((a, v, i) => {
+        const alphabetIndex = Number(v % alphabetLength)
+        const codePoint = this.alphabet[alphabetIndex]!.codePointAt(0)!
+
+        return a + BigInt(codePoint + i)
+      }, BigInt(numbers.length)) % alphabetLength,
+    )
 
     offset = (offset + increment) % this.alphabet.length
     let alphabet = this.alphabet.slice(offset) + this.alphabet.slice(0, offset)
@@ -743,23 +786,28 @@ export default class Sqids {
     return chars.join('')
   }
 
-  private toId(num: number, alphabet: string): string {
+  private toId(num: bigint, alphabet: string): string {
     const id = []
     const chars = alphabet.split('')
+    const alphabetLength = BigInt(chars.length)
 
     let result = num
 
     do {
-      id.unshift(chars[result % chars.length])
-      result = Math.floor(result / chars.length)
-    } while (result > 0)
+      id.unshift(chars[Number(result % alphabetLength)])
+      result /= alphabetLength
+    } while (result > 0n)
 
     return id.join('')
   }
 
-  private toNumber(id: string, alphabet: string): number {
+  private toNumber(id: string, alphabet: string): bigint {
     const chars = alphabet.split('')
-    return id.split('').reduce((a, v) => a * chars.length + chars.indexOf(v), 0)
+    const alphabetLength = BigInt(chars.length)
+
+    return id
+      .split('')
+      .reduce((a, v) => a * alphabetLength + BigInt(chars.indexOf(v)), 0n)
   }
 
   private isBlockedId(id: string): boolean {
@@ -784,7 +832,7 @@ export default class Sqids {
     return false
   }
 
-  private maxValue() {
-    return Number.MAX_SAFE_INTEGER
+  private maxValue(): bigint {
+    return this.bigintMode ? maxUint64 : BigInt(Number.MAX_SAFE_INTEGER)
   }
 }

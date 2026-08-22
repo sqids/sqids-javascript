@@ -28,11 +28,13 @@
   "exports": {
     ".": {
       "import": "./esm/sqids.js",
-      "require": "./cjs/sqids.js"
+      "require": "./cjs/sqids.js",
+      "types": "./esm/sqids.d.ts"
     },
     "./*": {
       "import": "./esm/*.js",
-      "require": "./cjs/*.js"
+      "require": "./cjs/*.js",
+      "types": "./esm/*.d.ts"
     },
     "./cjs": {
       "require": "./cjs/sqids.js"
@@ -57,21 +59,22 @@
     "src"
   ],
   "scripts": {
-    "benchmark": "yarn ts-node -O '{\"module\": \"commonjs\"}' -T src/tests/benchmark",
-    "postinstallDev": "yarn prepare",
-    "prepare": "rrun husky install .config/husky && yarn beemo create-config",
-    "build": "yarn build:cjs && yarn build:esm && yarn build:umd",
-    "release": "beemo run-script release",
-    "build:cjs": "yarn rrun tsc --outDir cjs --module commonjs --target es6 -p tsconfig.build.json",
-    "build:esm": "yarn rrun tsc --outDir esm --module esnext --target es6 -p tsconfig.build.json",
-    "build:umd": "beemo webpack --entry=./src/sqids.ts --env 'outDir=dist' --env 'moduleTarget=umd' --env 'engineTarget=web' --env 'codeTarget=es6' --env 'name=Sqids' --env 'export=default' --env 'filename=sqids.js'",
-    "clean": "git clean -dfX --exclude=node_modules src && beemo typescript:sync-project-refs",
-    "test:lint": "rrun eslint 'src/**'",
-    "test:code": "beemo jest",
-    "test:types": "yarn rrun tsc --noEmit",
-    "test:format": "yarn rrun prettier --check \"./{src,tests}/**/*[!.d].{.js,jsx,ts,tsx,json,md}\"",
-    "test": "yarn test:format && yarn test:types && yarn test:lint && yarn test:code",
-    "format": "yarn rrun prettier --write \"./{src,tests}/**/!(*.d).{.js,jsx,ts,tsx,json,md}\""
+    "prepare": "husky",
+    "build": "pnpm run build:cjs && pnpm run build:esm && pnpm run build:umd",
+    "build:cjs": "tsdown --format cjs --out-dir cjs --dts",
+    "build:esm": "tsdown --format esm --out-dir esm --dts",
+    "build:umd": "tsdown umd-entry.ts --format umd --out-dir dist --global-name Sqids --platform browser --minify",
+    "check": "biome check .",
+    "check:write": "biome check --write .",
+    "example": "tsdown examples/usage.ts --format esm --out-dir mjs/example && node mjs/example/usage.js",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "release": "semantic-release --extends ./release.config.mts",
+    "test": "pnpm run check && pnpm run test:types && pnpm run test:code",
+    "test:code": "vitest run",
+    "test:types": "tsc --noEmit",
+    "test:watch": "vitest"
   },
   "browserslist": [
     "last 2 version",
@@ -82,33 +85,25 @@
   "engines": {
     "node": ">=18"
   },
-  "devDependencies": {
-    "@niieani/scaffold": "^1.7.8",
-    "nodemark": "^0.3.0",
-    "require-from-web": "^1.2.0",
-    "ts-node": "^10.9.1"
-  },
   "publishConfig": {
     "access": "public"
   },
-  "release": {
-    "branches": [
-      "+([0-9])?(.{+([0-9]),x}).x",
-      "master",
-      {
-        "name": "main",
-        "channel": false
-      },
-      "next",
-      {
-        "name": "beta",
-        "prerelease": true
-      },
-      {
-        "name": "alpha",
-        "prerelease": true
-      }
-    ]
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
+  "devDependencies": {
+    "@biomejs/biome": "2.5.10",
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^11.0.1",
+    "@semantic-release/github": "^12.0.9",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.1",
+    "husky": "9.1.7",
+    "semantic-release": "25.0.9",
+    "tsdown": "0.22.14",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
   },
-  "packageManager": "yarn@3.6.1"
+  "types": "esm/sqids.d.ts"
 }

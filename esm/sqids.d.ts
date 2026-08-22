@@ -1,25 +1,30 @@
-interface SqidsOptions {
-    alphabet?: string;
-    minLength?: number;
-    blocklist?: Set<string>;
+//#region src/sqids.d.ts
+type SqidsInteger<BigIntMode extends boolean> = BigIntMode extends true ? bigint : number;
+interface SqidsOptions<BigIntMode extends boolean = false> {
+  alphabet?: string;
+  minLength?: number;
+  blocklist?: Set<string>;
+  bigint?: BigIntMode;
 }
-export declare const defaultOptions: {
-    alphabet: string;
-    minLength: number;
-    blocklist: Set<string>;
+declare const defaultOptions: {
+  alphabet: string;
+  minLength: number;
+  blocklist: Set<string>;
 };
-export default class Sqids {
-    private alphabet;
-    private minLength;
-    private blocklist;
-    constructor(options?: SqidsOptions);
-    encode(numbers: number[]): string;
-    decode(id: string): number[];
-    private encodeNumbers;
-    private shuffle;
-    private toId;
-    private toNumber;
-    private isBlockedId;
-    private maxValue;
+declare class Sqids<BigIntMode extends boolean = false> {
+  private alphabet;
+  private minLength;
+  private blocklist;
+  private bigintMode;
+  constructor(options?: SqidsOptions<BigIntMode>);
+  encode(numbers: SqidsInteger<BigIntMode>[]): string;
+  decode(id: string): SqidsInteger<BigIntMode>[];
+  private encodeNumbers;
+  private shuffle;
+  private toId;
+  private toNumber;
+  private isBlockedId;
 }
-export {};
+//#endregion
+export { SqidsOptions, Sqids as default, defaultOptions };
+//# sourceMappingURL=sqids.d.ts.map

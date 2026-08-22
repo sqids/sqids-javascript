@@ -8,8 +8,8 @@
       "package.json",
       "tsconfig.json",
       "tsconfig.build.json",
-      "commitlint.config.mjs",
-      "release.config.mjs",
+      "commitlint.config.mts",
+      "release.config.mts",
       "tsdown.config.mts",
       "vitest.config.mts"
     ]

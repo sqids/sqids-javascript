@@ -69,7 +69,7 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint": "biome lint .",
-    "release": "semantic-release",
+    "release": "semantic-release --extends ./release.config.mts",
     "test": "pnpm run check && pnpm run test:types && pnpm run test:code",
     "test:code": "vitest run",
     "test:types": "tsc --noEmit",

@@ -6,56 +6,83 @@ on:
       - master
       - main
       - next
+      - beta
+      - alpha
   pull_request:
     branches:
       - '**'
 
 permissions:
-  actions: write
-  contents: write
-  deployments: write
-  issues: write
-  packages: write
-  pull-requests: write
-  security-events: write
-  statuses: write
+  contents: read
 
 jobs:
   test:
-    name: Test on node ${{ matrix.node }}
+    name: Check, test, and build
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [18]
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-          cache: 'yarn'
-      - name: Install dependencies and test
-        run: |
-          yarn install --immutable
-          yarn build
-          yarn test
+          node-version: 22.18.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test:types
+      - run: pnpm test:code
+      - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-build
+          path: |
+            cjs
+            esm
+            dist
 
-  publish:
-    name: Publish package to NPM
+  node-18-smoke-test:
+    name: Node 18 package smoke test
     needs: test
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next')
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-build
+          path: .
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'yarn'
-      - name: Build and release
-        run: |
-          yarn install --immutable
-          yarn build
-          yarn release
+      - name: Verify CommonJS entry
+        run: node -e "const Sqids = require('./cjs/sqids.js').default; const sqids = new Sqids(); if (sqids.decode(sqids.encode([1, 2, 3])).join() !== '1,2,3') process.exit(1)"
+      - name: Verify ESM entry
+        run: node --input-type=module -e "import Sqids from './esm/sqids.js'; const sqids = new Sqids(); if (sqids.decode(sqids.encode([1, 2, 3])).join() !== '1,2,3') process.exit(1)"
+      - name: Verify UMD browser global
+        run: node -e "const fs = require('node:fs'), vm = require('node:vm'); const context = { Blob }; vm.runInNewContext(fs.readFileSync('./dist/sqids.js', 'utf8'), context); const sqids = new context.Sqids(); if (sqids.decode(sqids.encode([1, 2, 3])).join() !== '1,2,3') process.exit(1)"
+
+  publish:
+    name: Publish package
+    needs: [test, node-18-smoke-test]
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/alpha')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm release
         env:
-          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -640,9 +640,13 @@ export default class Sqids<BigIntMode extends boolean = false> {
 
     const normalizedNumbers = numbers.map((number) => {
       if (this.bigintMode) {
-        if (typeof number !== 'bigint' || number < 0n || number > maxUint64) {
+        if (
+          typeof number !== 'bigint' ||
+          number < 0n ||
+          number > this.maxValue()
+        ) {
           throw new Error(
-            `Encoding supports bigints between 0n and ${maxUint64}n`,
+            `Encoding supports bigints between 0n and ${this.maxValue()}n`,
           )
         }
 
@@ -655,7 +659,7 @@ export default class Sqids<BigIntMode extends boolean = false> {
         number < 0
       ) {
         throw new Error(
-          `Encoding supports numbers between 0 and ${Number.MAX_SAFE_INTEGER}`,
+          `Encoding supports numbers between 0 and ${this.maxValue()}`,
         )
       }
 
@@ -697,10 +701,7 @@ export default class Sqids<BigIntMode extends boolean = false> {
         }
 
         const number = this.toNumber(chunks[0]!, alphabet.slice(1))
-        if (
-          (this.bigintMode && number > maxUint64) ||
-          (!this.bigintMode && number > BigInt(Number.MAX_SAFE_INTEGER))
-        ) {
+        if (number > this.maxValue()) {
           return [] as SqidsInteger<BigIntMode>[]
         }
 
@@ -829,5 +830,9 @@ export default class Sqids<BigIntMode extends boolean = false> {
     }
 
     return false
+  }
+
+  private maxValue(): bigint {
+    return this.bigintMode ? maxUint64 : BigInt(Number.MAX_SAFE_INTEGER)
   }
 }

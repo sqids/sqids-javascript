@@ -1,6 +1,4 @@
-.yarn/**/* binary
 cjs/**/* binary
 dist/**/* binary
 esm/**/* binary
 package-lock.json binary
-yarn.lock binary

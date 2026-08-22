@@ -3,11 +3,8 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - master
       - main
       - next
-      - beta
-      - alpha
   pull_request:
     branches:
       - '**'
@@ -64,7 +61,7 @@ jobs:
     name: Publish package
     needs: [test, node-18-smoke-test]
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/alpha')
+    if: github.actor != 'github-actions[bot]' && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next')
     permissions:
       contents: write
       issues: write

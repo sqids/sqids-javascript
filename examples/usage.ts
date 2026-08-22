@@ -9,8 +9,19 @@ console.log('  Input:', numbers)
 console.log('  Encoded:', numberId)
 console.log('  Decoded:', numberSqids.decode(numberId))
 
+const unsafeNumber = Number.MAX_SAFE_INTEGER + 1
+
+console.log('Number mode with an unsafe integer:')
+console.log('  Input:', [unsafeNumber])
+
+try {
+  numberSqids.encode([unsafeNumber])
+} catch (error) {
+  console.log('  Error:', error instanceof Error ? error.message : error)
+}
+
 const bigintSqids = new Sqids({ bigint: true })
-const bigints = [1n, 2n, 3n]
+const bigints = [1n, 2n, BigInt(unsafeNumber)]
 const bigintId = bigintSqids.encode(bigints)
 
 console.log('BigInt mode:')

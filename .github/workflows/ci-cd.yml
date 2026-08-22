@@ -37,10 +37,14 @@ jobs:
             esm
             dist
 
-  node-18-smoke-test:
-    name: Node 18 package smoke test
+  package-smoke-test:
+    name: Node ${{ matrix.node }} package smoke test
     needs: test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -49,7 +53,7 @@ jobs:
           path: .
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ matrix.node }}
       - name: Verify CommonJS entry
         run: node -e "const Sqids = require('./cjs/sqids.js').default; const sqids = new Sqids(); if (sqids.decode(sqids.encode([1, 2, 3])).join() !== '1,2,3') process.exit(1)"
       - name: Verify ESM entry
@@ -59,7 +63,7 @@ jobs:
 
   publish:
     name: Publish package
-    needs: [test, node-18-smoke-test]
+    needs: [test, package-smoke-test]
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]' && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next')
     permissions:
